@@ -1,0 +1,52 @@
+{
+  "name": "react-editable-table",
+  "version": "0.2.7",
+  "description": "React data components",
+  "keywords": [
+    "react",
+    "react-component",
+    "table",
+    "pagination"
+  ],
+  "author": "Carlos Rocha",
+  "license": "MIT",
+  "main": "./lib/index",
+  "files": [
+    "css",
+    "lib",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/slavik-m/react-data-components"
+  },
+  "peerDependencies": {
+    "react": "^0.12.2"
+  },
+  "devDependencies": {
+    "css-loader": "^0.7.1",
+    "d3": "^3.4.11",
+    "jest-cli": "^0.2.1",
+    "jsx-loader": "^0.12.2",
+    "react-tools": "^0.12.2",
+    "style-loader": "^0.7.1",
+    "webpack": "^1.4.15",
+    "webpack-dev-server": "^1.6.6"
+  },
+  "scripts": {
+    "prepublish": "./node_modules/react-tools/bin/jsx --harmony --no-cache-dir src lib",
+    "start": "cd example && webpack-dev-server --progress --colors --hot --inline",
+    "test": "jest"
+  },
+  "jest": {
+    "rootDir": "src",
+    "scriptPreprocessor": "../jest/preprocessor.js",
+    "unmockedModulePathPatterns": [
+      "../node_modules/react"
+    ]
+  },
+  "dependencies": {
+    "lodash": "^4.3.0"
+  }
+}

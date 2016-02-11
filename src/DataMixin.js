@@ -68,7 +68,8 @@ module.exports = {
   },
 
   handleChange(col, row, val) {
-    var { data } = _.cloneDeep(this.state);
+    var { data } = _.clone(this.state);
+    console.log('Data cloned');
 
     var index = _.indexOf(data, _.find(data, row)),
       prop = col.prop;
@@ -91,7 +92,7 @@ module.exports = {
   },
 
   handleDelete() {
-    var { data } = _.cloneDeep(this.state);
+    var { data } = _.clone(this.state);
     console.log('Delete');
     _.remove(data, item => item.checked);
 
@@ -106,7 +107,7 @@ module.exports = {
   },
 
   handleAdd() {
-    var {data, pageLength} = _.cloneDeep(this.state);
+    var {data} = _.clone(this.state);
     var newObj = { ukey: Date.now()};
     this.state.itemKeys.forEach(key => {
       newObj[key] = '';

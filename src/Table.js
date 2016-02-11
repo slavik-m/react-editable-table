@@ -198,6 +198,7 @@ var Table = React.createClass({
   },
 
   handleCheck(row, ev) {
+    console.log('Check');
     this.props.onChange({prop: 'checked'}, row, ev.target.checked);
   },
 
@@ -232,7 +233,10 @@ var Table = React.createClass({
     var rows = this.props.dataArray.map((row, r) =>
       <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr">
         <td key={r} className="checkbox-td">
-          <input type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)}></input>
+          <div className="checkbox">
+            <input id={'check' + r} type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)}></input>
+            <label htmlFor={'check' + r}></label>
+          </div>
         </td>
         {columns.map(
           (col, i) =>{
@@ -262,8 +266,8 @@ var Table = React.createClass({
     return (
       <div>
         <div className="table-controls">
-          <button className="btn btn-primary opt-btn" onClick={this.handleAdd}>+</button>
-          <button className="btn btn-danger opt-btn" onClick={this.handleDelete}>-</button>
+          <button className="btn btn-primary btn-sm opt-btn" onClick={this.handleAdd}>+</button>
+          <button className="btn btn-danger btn-sm opt-btn" onClick={this.handleDelete}>-</button>
         </div>
         <table className={this.props.className}>
           <caption className="sr-only" role="alert" aria-live="polite">

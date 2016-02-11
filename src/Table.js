@@ -79,7 +79,7 @@ var EditInput = React.createClass({
       this.handleSave(ev);
     }
     if (ev.keyCode === 27) {
-      // console.log("Cancel");
+      this.props.onCancel(this.props.col, this.props.row, this.props.target);
     }
   },
 
@@ -156,51 +156,49 @@ var Table = React.createClass({
     }
   },
 
+  setError(target) {
+    target.classList.add('error');
+  },
+
   handleCellClick(col, row, ev) {
-    const val = getCellValue(col, row);
-    React.render(<EditInput value={val} col={col} row={row} target={ev.target}
-                            onChange={this.handleChange}/>, ev.target);
+    ev.target.classList.remove('empty-cell');
+    React.render(<EditInput value={row[col.prop]}
+                            col={col}
+                            row={row}
+                            target={ev.target}
+                            onChange={this.handleChange}
+                            onCancel={this.handleCancel} />, ev.target);
   },
 
   handleChange(col, row, val, target) {
-    this.props.onChange(col, row, val);
-    React.render(<span>{val}</span>, target);
-  },
-
-  handleDelete(row, ev) {
-    this.props.onDelete(row);
-    React.unmountComponentAtNode(this.refs.tableContainer.getDOMNode());
-  },
-
-  handleTrHover(row, ev) {
-    // var position = ev.target.parentNode.getBoundingClientRect();
-    var width = 40,
-      height = 40,
-      x = ev.target.parentNode.offsetLeft ,
-      y = ev.target.parentNode.offsetTop + ev.target.parentNode.offsetHeight/2 - height/2;
-
-    // console.log(ev.target.parentNode.getBoundingClientRect().top);
-    // console.log('render');
-    React.render(<div id="remove" style={{position: 'absolute', top: y, left: x, width: width, height: height}}>
-      <div className="table-remove-tr glyphicon glyphicon-remove-circle" onClick={this.handleDelete.bind(this, row)}></div>
-    </div>, this.refs.tableContainer.getDOMNode());
-  },
-
-  handleHoverComponent(ev) {
-    ev.target.dataset.hovered = true;
-  },
-
-  handleRemoveOptionsComponent(ev) {
-    // console.log('remove', document.getElementById('remove'));
-    ev.target.dataset.hovered = false;
-    React.unmountComponentAtNode(this.refs.tableContainer.getDOMNode());
-  },
-
-  handleTrHoverLeave: function() {
-    // console.log(!this.refs.tableContainer.getDOMNode().dataset.hovered);
-    if(!this.refs.tableContainer.getDOMNode().dataset.hovered){
-      React.unmountComponentAtNode(this.refs.tableContainer.getDOMNode());
+    if(col.hasOwnProperty('validation')){
+      if(col.validation.test(val)) {
+        target.classList.remove('error');
+        this.props.onChange(col, row, val);
+        React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
+      } else {
+        this.setError(target);
+      }
+    } else {
+      this.props.onChange(col, row, val);
+      React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
     }
+  },
+
+  handleCancel(col, row, target) {
+    React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
+  },
+
+  handleDelete() {
+    this.props.onDelete();
+  },
+
+  handleAdd() {
+    this.props.onAdd();
+  },
+
+  handleCheck(row, ev) {
+    this.props.onChange({prop: 'checked'}, row, ev.target.checked);
   },
 
   render() {
@@ -231,19 +229,27 @@ var Table = React.createClass({
     });
 
     var getKeys = Array.isArray(keys) ? keyGetter(keys) : simpleGet(keys);
-    var rows = this.props.dataArray.map(row =>
-      <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr"
-          onMouseEnter={this.handleTrHover.bind(this, row)}
-          onMouseLeave={this.handleTrHoverLeave}
-        >
+    var rows = this.props.dataArray.map((row, r) =>
+      <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr">
+        <td key={r} className="checkbox-td">
+          <input type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)}></input>
+        </td>
         {columns.map(
-          (col, i) =>
-            <td key={i}
-                ref={i + getCellValue(col, row)}
-                className={getCellClass(col, row)}
-                onClick={this.handleCellClick.bind(this, col, row)}>
-              {getCellValue(col, row)}
-            </td>
+          (col, i) =>{
+            const edit = col.hasOwnProperty('editable') ? col.editable : true;
+            return edit ?
+              (<td key={i}
+                   ref={i + getCellValue(col, row)}
+                   className={getCellClass(col, row)}
+                   onClick={this.handleCellClick.bind(this, col, row)}>
+                {getCellValue(col, row)}
+              </td>) :
+              (<td key={i}
+                   ref={i + getCellValue(col, row)}
+                   className={getCellClass(col, row)}>
+                {getCellValue(col, row)}
+              </td>);
+          }
         )}
       </tr>);
 
@@ -254,24 +260,25 @@ var Table = React.createClass({
       left: '-40px'
     };
     return (
-      <div style={{position: 'relative'}}>
-        <div ref="tableContainer"
-             style={style}
-             onMouseEnter={this.handleHoverComponent}
-             onMouseLeave={this.handleRemoveOptionsComponent}></div>
+      <div>
+        <div className="table-controls">
+          <button className="btn btn-primary opt-btn" onClick={this.handleAdd}>+</button>
+          <button className="btn btn-danger opt-btn" onClick={this.handleDelete}>-</button>
+        </div>
         <table className={this.props.className}>
           <caption className="sr-only" role="alert" aria-live="polite">
             {`Sorted by ${sortBy.prop}: ${sortBy.order} order`}
           </caption>
           <thead>
           <tr>
+            <th className="checkbox-th"></th>
             {headers}
           </tr>
           </thead>
           <tbody>
           {rows.length > 0 ? rows :
             <tr>
-              <td colSpan={columns.length} className="text-center">No data</td>
+              <td colSpan={columns.length + 1} className="text-center">No data</td>
             </tr>}
           </tbody>
         </table>

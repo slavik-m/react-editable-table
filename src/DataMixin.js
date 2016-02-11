@@ -12,12 +12,15 @@ var containsIgnoreCase = function(a, b) {
 module.exports = {
 
   getInitialState() {
+    const data = this.props.initialData.slice(0);
+    const itemKeys = this.props.columns.map(item => item.prop);
     return {
       // Clone the initialData.
-      data: this.props.initialData.slice(0),
+      data: data,
       sortBy: this.props.initialSortBy,
       filterValues: {},
       currentPage: 0,
+      itemKeys: itemKeys,
       pageLength: this.props.initialPageLength
     };
   },
@@ -77,13 +80,39 @@ module.exports = {
 
     this.setState({
       data: data
+    }, () => {
+      if(prop !== 'checked') {
+        this.props.onChange(data.map(item => {
+          delete item.checked;
+          return item;
+        }));
+      }
     });
   },
 
-  handleDelete(row) {
+  handleDelete() {
     var { data } = _.cloneDeep(this.state);
-    console.log('remove');
-    _.remove(data, row);
+    console.log('Delete');
+    _.remove(data, item => item.checked);
+
+    this.setState({
+      data:data
+    }, () => {
+      this.props.onChange(data.map(item => {
+        delete item.checked;
+        return item;
+      }));
+    });
+  },
+
+  handleAdd() {
+    var {data, pageLength} = _.cloneDeep(this.state);
+    var newObj = { ukey: Date.now()};
+    this.state.itemKeys.forEach(key => {
+      newObj[key] = '';
+    });
+    data.unshift(newObj);
+
     this.setState({
       data:data
     });

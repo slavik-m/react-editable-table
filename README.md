@@ -1,6 +1,6 @@
-# react-data-components
+# react-editable-table
 
-DataTable: [Live demo and source](http://jsbin.com/ziyawu/1/).
+Based on: [react-data-components](https://github.com/carlosrocha/react-data-components).
 
 ## Getting started
 
@@ -15,17 +15,17 @@ pagination and page size.
 
 ```javascript
 var React = require('react');
-var DataTable = require('react-data-components').DataTable;
+var DataTable = require('react-editable-table').DataTable;
 
 var columns = [
-  { title: 'Name', prop: 'name'  },
-  { title: 'City', prop: 'city' },
-  { title: 'Address', prop: 'address' },
-  { title: 'Phone', prop: 'phone' }
+  { title: 'Site', prop: 'site'  },
+  { title: 'Country', prop: 'country' },
+  { title: 'Domain', prop: 'domain', validation: /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/ },
+  { title: 'Phone', prop: 'phone', editable: false }
 ];
 
 var data = [
-  { name: 'name value', city: 'city value', address: 'address value', phone: 'phone value' }
+  { site: 'google', country: 'USA', domain: 'google.com', phone: 'phone value' }
   // It also supports arrays
   // [ 'name value', 'city value', 'address value', 'phone value' ]
 ];
@@ -33,17 +33,17 @@ var data = [
 React.render((
     <DataTable
       className="container"
-      keys={[ 'name', 'address' ]}
+      keys={[ 'site' ]}
       columns={columns}
       initialData={data}
       initialPageLength={5}
-      initialSortBy={{ prop: 'city', order: 'desc' }}
+      initialSortBy={{ prop: 'site', order: 'desc' }}
       pageLengthOptions={[ 5, 20, 50 ]}
     />
   ), document.body);
 ```
 
-See [complete example](example/table/main.js), see [Flux example](example/flux/).
+See [complete example](example/table/main.js).
 
 ## DataMixin options
 
@@ -65,6 +65,9 @@ The title to display on the header.
 
 ### `prop: string | number`
 The name of the property or index on the data.
+
+### `editable: boolean`
+Enable / Disable possibility edit property data.
 
 ### `render: (val: any, row: any) => any`
 Function to render a different component.

@@ -39,7 +39,7 @@ var sortByFunc =
 var sortByNumberFunc =
   (prop) =>
     (a, b) => {
-      return parseInt(a[prop].replace(/,/gm,''), 10) - parseInt(b[prop].replace(/,/gm,''), 10);
+      return parseFloat(a[prop].replace(/,/gm,''), 10) - parseFloat(b[prop].replace(/,/gm,''), 10);
       /*parseInt(a[prop].replace(/,/gm,''), 10) < parseInt(b[prop].replace(/,/gm,''), 10) ?
         -1 : parseInt(a[prop].replace(/,/gm,''), 10) > parseInt(b[prop].replace(/,/gm,''), 10) ?
         1 : 0*/
@@ -52,8 +52,11 @@ var sortByNumberFunc =
  */
 function sort(sortBy, data) {
   var sortedData;
+  if(data.length === 0) {
+    return [];
+  }
 
-  if(isNumber(parseInt(data[0][sortBy.prop], 10))) {
+  if(isNumber(parseFloat(data[0][sortBy.prop], 10))) {
     sortedData = data.sort(sortByNumberFunc(sortBy.prop));
   } else {
     sortedData = data.sort(sortByFunc(sortBy.prop));

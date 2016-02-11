@@ -15,6 +15,8 @@ var DataTable = React.createClass({
 
   render() {
     var page = this.buildPage();
+    // const cols = this.props.columns.slice(0);
+    // cols.unshift({title: '', prop: 'checked', sort: false, editable: false });
     return (
       <div className={this.props.className}>
         <div className="row table-options">
@@ -45,6 +47,7 @@ var DataTable = React.createClass({
           onSort={this.onSort}
           onChange={this.handleChange}
           onDelete={this.handleDelete}
+          onAdd={this.handleAdd}
         />
         <div className="row">
           <div className="col-xs-6">

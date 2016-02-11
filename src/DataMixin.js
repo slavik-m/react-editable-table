@@ -14,9 +14,11 @@ module.exports = {
   getInitialState() {
     var data = this.props.initialData.slice(0);
     var itemKeys = this.props.columns.map(item => item.prop);
+    // if()
     return {
       // Clone the initialData.
       data: data,
+      initialData: data,
       sortBy: this.props.initialSortBy,
       filterValues: {},
       currentPage: 0,
@@ -59,7 +61,6 @@ module.exports = {
     filterValues[filterName] = filterValue;
     var newData = filter(filters, filterValues, initialData);
     newData = sort(sortBy, newData);
-
     this.setState({
       data: newData,
       filterValues: filterValues,
@@ -68,20 +69,20 @@ module.exports = {
   },
 
   handleChange(col, row, val) {
-    var { data } = _.clone(this.state);
-    var index = _.indexOf(data, _.find(data, row)),
+    var { initialData } = _.clone(this.state);
+    var index = _.indexOf(initialData, _.find(initialData, row)),
       prop = col.prop;
 
     var newRow = _.clone(row);
       newRow[prop] = val;
 
-    data.splice(index, 1, newRow);
+    initialData.splice(index, 1, newRow);
 
     this.setState({
-      data: data
+      initialData: initialData
     }, () => {
       if(prop !== 'checked') {
-        this.props.onChange(data.map(item => {
+        this.props.onChange(initialData.map(item => {
           delete item.checked;
           return item;
         }));
@@ -90,13 +91,13 @@ module.exports = {
   },
 
   handleDelete() {
-    var { data } = _.clone(this.state);
-    _.remove(data, item => item.checked);
+    var { initialData } = _.clone(this.state);
+    _.remove(initialData, item => item.checked);
 
     this.setState({
-      data:data
+      data: initialData
     }, () => {
-      this.props.onChange(data.map(item => {
+      this.props.onChange(initialData.map(item => {
         delete item.checked;
         return item;
       }));
@@ -104,15 +105,15 @@ module.exports = {
   },
 
   handleAdd() {
-    var {data} = _.clone(this.state);
+    var { initialData } = _.clone(this.state);
     var newObj = { ukey: Date.now()};
     this.state.itemKeys.forEach(key => {
       newObj[key] = '';
     });
-    data.unshift(newObj);
+    initialData.unshift(newObj);
 
     this.setState({
-      data:data
+      data: initialData
     });
   },
 

@@ -5,7 +5,9 @@ var React = require('react');
 var SearchField = React.createClass({
 
   onChange(e) {
-    this.props.onChange(e.target.value);
+    if(e.keyCode == 13) {
+      this.props.onChange(e.target.value);
+    }
   },
 
   render() {
@@ -16,8 +18,8 @@ var SearchField = React.createClass({
           id={this.props.id}
           className="form-control"
           type="text"
-          value={this.props.value}
-          onChange={this.onChange}
+          defaultValue={this.props.value}
+          onKeyUp={this.onChange}
         />
       </div>
     );

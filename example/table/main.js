@@ -18,6 +18,7 @@ var App = React.createClass({
   },
 
   handleChange(data) {
+    console.log(data.length);
     this.setState({
       data: data
     });

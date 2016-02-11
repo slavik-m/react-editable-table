@@ -69,8 +69,6 @@ module.exports = {
 
   handleChange(col, row, val) {
     var { data } = _.clone(this.state);
-    console.log('Data cloned');
-
     var index = _.indexOf(data, _.find(data, row)),
       prop = col.prop;
 
@@ -93,7 +91,6 @@ module.exports = {
 
   handleDelete() {
     var { data } = _.clone(this.state);
-    console.log('Delete');
     _.remove(data, item => item.checked);
 
     this.setState({

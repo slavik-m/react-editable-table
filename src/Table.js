@@ -198,7 +198,6 @@ var Table = React.createClass({
   },
 
   handleCheck(row, ev) {
-    console.log('Check');
     this.props.onChange({prop: 'checked'}, row, ev.target.checked);
   },
 

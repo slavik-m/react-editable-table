@@ -12,8 +12,8 @@ var containsIgnoreCase = function(a, b) {
 module.exports = {
 
   getInitialState() {
-    const data = this.props.initialData.slice(0);
-    const itemKeys = this.props.columns.map(item => item.prop);
+    var data = this.props.initialData.slice(0);
+    var itemKeys = this.props.columns.map(item => item.prop);
     return {
       // Clone the initialData.
       data: data,

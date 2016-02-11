@@ -66,16 +66,18 @@ var DataTable = React.createClass({
               />
           </div>
         </div>
-        <div className="row">
-          <pre>
-            <code>
-              {JSON.stringify(this.state.data, null, "\t")}
-            </code>
-          </pre>
-        </div>
       </div>
     );
   }
 });
 
 module.exports = DataTable;
+/*
+ <div className="row">
+ <pre>
+ <code>
+ {JSON.stringify(this.state.data, null, "\t")}
+ </code>
+ </pre>
+ </div>
+ */

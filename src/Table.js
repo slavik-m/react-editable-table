@@ -236,7 +236,7 @@ var Table = React.createClass({
         </td>
         {columns.map(
           (col, i) =>{
-            const edit = col.hasOwnProperty('editable') ? col.editable : true;
+            var edit = col.hasOwnProperty('editable') ? col.editable : true;
             return edit ?
               (<td key={i}
                    ref={i + getCellValue(col, row)}

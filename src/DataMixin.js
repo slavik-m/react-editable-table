@@ -47,6 +47,21 @@ module.exports = {
     }
   },
 
+  componentWillReceiveProps(nextProps) {
+    if(this.state.filterValues.globalSearch) {
+      var {filterValues, sortBy} = this.state;
+      var {initialData, filters} = nextProps;
+
+      var newData = filter(filters, filterValues, initialData);
+      newData = sort(sortBy, newData);
+      this.setState({
+        data: newData,
+        filterValues: filterValues,
+        currentPage: 0
+      });
+    }
+  },
+
   onSort(sortBy) {
     this.setState({
       sortBy: sortBy,

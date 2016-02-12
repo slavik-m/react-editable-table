@@ -10,17 +10,27 @@ var SearchField = React.createClass({
     }
   },
 
+  handleClick() {
+    this.props.onChange(this.refs.input.getDOMNode().value);
+  },
+
   render() {
     return (
       <div className="table-search">
         <label htmlFor={this.props.id}>{this.props.label}</label>
-        <input
-          id={this.props.id}
-          className="form-control"
-          type="text"
-          defaultValue={this.props.value}
-          onKeyUp={this.onChange}
-        />
+        <div className="input-group">
+          <input
+            ref="input"
+            id={this.props.id}
+            className="form-control"
+            type="text"
+            defaultValue={this.props.value}
+            onKeyUp={this.onChange}
+          />
+          <span className="btn btn-sm input-group-addon" onClick={this.handleClick}>
+            <span className="glyphicon glyphicon-search"></span>
+          </span>
+        </div>
       </div>
     );
   }

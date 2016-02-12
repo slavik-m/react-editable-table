@@ -29,7 +29,7 @@ var DataTable = React.createClass({
               onChange={this.onPageLengthChange}
             />
           </div>
-          <div className="col-xs-8 ">
+          <div className="col-xs-6 col-xs-offset-2">
             <SearchField
               id="search-field pull-right"
               label="Search:"

@@ -4,6 +4,12 @@ var React = require('react');
 
 var SearchField = React.createClass({
 
+  getDefaultProps: function() {
+    return {
+      searchIcon: 'glyphicon glyphicon-search'
+    };
+  },
+
   onChange(e) {
     if(e.keyCode == 13) {
       this.props.onChange(e.target.value);
@@ -27,9 +33,11 @@ var SearchField = React.createClass({
             defaultValue={this.props.value}
             onKeyUp={this.onChange}
           />
-          <span className="btn btn-sm input-group-addon" onClick={this.handleClick}>
-            <span className="glyphicon glyphicon-search"></span>
-          </span>
+          <div className="input-group-btn">
+            <button className="btn btn-default" type="button"  onClick={this.handleClick}>
+              <span className={this.props.searchIcon}></span>
+            </button>
+          </div>
         </div>
       </div>
     );

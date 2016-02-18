@@ -32,9 +32,11 @@ var DataTable = React.createClass({
           <div className="col-xs-6 col-xs-offset-2">
             <SearchField
               id="search-field pull-right"
+              ref="search"
               label="Search:"
               value={this.state.filterValues.globalSearch}
               searchIcon={this.props.searchIcon}
+              searchBtnClass={this.props.searchBtnClass}
               onChange={this.onFilter.bind(this, 'globalSearch')}
               />
           </div>

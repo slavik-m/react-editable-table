@@ -59,6 +59,15 @@ module.exports = {
         filterValues: filterValues,
         currentPage: 0
       });
+    } else {
+      this.setState({
+        data: nextProps.initialData,
+        initialData: nextProps.initialData,
+        currentPage: 0,
+        filterValues: {
+          globalSearch: ''
+        }
+      });
     }
   },
 
@@ -128,7 +137,10 @@ module.exports = {
     initialData.unshift(newObj);
 
     this.setState({
-      data: initialData
+      data: initialData,
+      filterValues: {
+        globalSearch: ''
+      }
     });
   },
 

@@ -1,19 +1,40 @@
 'use strict';
 
 var React = require('react');
+var emptyFunction = function () {
+};
 
 var SearchField = React.createClass({
 
-  getDefaultProps: function() {
+  getInitialState: function () {
     return {
-      searchIcon: 'glyphicon glyphicon-search'
+      value: this.props.value
     };
   },
 
-  onChange(e) {
-    if(e.keyCode == 13) {
+  getDefaultProps: function () {
+    return {
+      searchIcon: 'glyphicon glyphicon-search',
+      searchBtnClass: 'btn btn-default'
+    };
+  },
+
+  componentWillReceiveProps: function (nextProps) {
+    this.setState({
+      value: nextProps.value
+    });
+  },
+
+  onKeyUp(e) {
+    if (e.keyCode == 13) {
       this.props.onChange(e.target.value);
     }
+  },
+
+  onChange: function(ev) {
+    this.setState({
+      value: ev.target.value
+    });
   },
 
   handleClick() {
@@ -30,11 +51,12 @@ var SearchField = React.createClass({
             id={this.props.id}
             className="form-control"
             type="text"
-            defaultValue={this.props.value}
-            onKeyUp={this.onChange}
-          />
+            value={this.state.value}
+            onChange={this.onChange}
+            onKeyUp={this.onKeyUp}
+            />
           <div className="input-group-btn">
-            <button className="btn btn-default" type="button"  onClick={this.handleClick}>
+            <button className={this.props.searchBtnClass} type="button" onClick={this.handleClick}>
               <span className={this.props.searchIcon}></span>
             </button>
           </div>

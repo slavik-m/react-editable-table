@@ -74,6 +74,18 @@ var EditInput = React.createClass({
     this.props.onChange(this.props.col, this.props.row, this.state.value, this.props.target);
   },
 
+  handleBlur(ev) {
+    if(this.props.col.hasOwnProperty('validation')){
+      if(this.props.col.validation.test(ev.target.value)) {
+        this.handleSave();
+      } else {
+        this.props.onCancel(this.props.col, this.props.row, this.props.target);
+      }
+    } else {
+      this.handleSave();
+    }
+  },
+
   handleKeyUp(ev) {
     if (ev.keyCode === 13) {
       this.handleSave(ev);
@@ -90,7 +102,7 @@ var EditInput = React.createClass({
              className="edit-input"
              value={this.state.value}
              onChange={this.handleChange}
-             onBlur={this.handleSave}
+             onBlur={this.handleBlur}
              onFocus={this.handleFocus}
              onKeyUp={this.handleKeyUp}/>
     );
@@ -186,6 +198,7 @@ var Table = React.createClass({
   },
 
   handleCancel(col, row, target) {
+    target.classList.remove('error');
     React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
   },
 

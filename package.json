@@ -1,6 +1,6 @@
 {
   "name": "react-editable-table",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "React data components",
   "keywords": [
     "react",
@@ -8,7 +8,7 @@
     "table",
     "pagination"
   ],
-  "author": "Carlos Rocha",
+  "author": "Minchonok Viacheslav",
   "license": "MIT",
   "main": "./lib/index",
   "files": [

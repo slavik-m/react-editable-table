@@ -6,6 +6,7 @@ var simpleGet = key => data => data[key];
 var keyGetter = keys => data => keys.map(key => data[key]);
 
 var isEmpty = value => value === undefined || value === null || value === '';
+var _ = require('lodash');
 
 var getCellValue =
   ({ prop, defaultContent, render }, row) =>
@@ -214,6 +215,14 @@ var Table = React.createClass({
     this.props.onChange({prop: 'checked'}, row, ev.target.checked);
   },
 
+  handleCheckAll(ev) {
+    this.props.dataArray.forEach(row => this.props.onChange({prop: 'checked'}, row, ev.target.checked));
+  },
+
+  isCheckedAll() {
+    return _.every(this.props.dataArray, { checked: true });
+  },
+
   render() {
     var { columns, keys, buildRowOpts, sortBy, onSort } = this.props;
 
@@ -246,8 +255,8 @@ var Table = React.createClass({
       <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr">
         <td key={r} className="checkbox-td">
           <div className="checkbox">
-            <input id={'check' + r} type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)}></input>
-            <label htmlFor={'check' + r}></label>
+            <input id={'check' + r} type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)} />
+            <label htmlFor={'check' + r} />
           </div>
         </td>
         {columns.map(
@@ -287,7 +296,9 @@ var Table = React.createClass({
           </caption>
           <thead>
           <tr>
-            <th className="checkbox-th"></th>
+            <th className="checkbox-th">
+              <input id={'check-all'} type="checkbox" checked={this.isCheckedAll()} onChange={this.handleCheckAll} />
+            </th>
             {headers}
           </tr>
           </thead>

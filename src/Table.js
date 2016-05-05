@@ -297,7 +297,8 @@ var Table = React.createClass({
           <thead>
           <tr>
             <th className="checkbox-th">
-              <input id={'check-all'} type="checkbox" checked={this.isCheckedAll()} onChange={this.handleCheckAll} />
+              <input id="check-all" type="checkbox" checked={this.isCheckedAll()} onChange={this.handleCheckAll} />
+              <label htmlFor="check-all" />
             </th>
             {headers}
           </tr>

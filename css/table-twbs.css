@@ -41,11 +41,9 @@
     position: relative;
 }
 
-.editable-table .checkbox {
+.editable-table .checkbox-container {
     margin: 0 -46px 0 0;
 }
-
-
 
 .editable-table td.error .edit-input {
     color: #d9534f;

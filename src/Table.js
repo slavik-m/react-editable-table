@@ -254,8 +254,8 @@ var Table = React.createClass({
     var rows = this.props.dataArray.map((row, r) =>
       <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr">
         <td key={r} className="checkbox-td">
-          <div className="checkbox">
-            <input id={'check' + r} type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)} />
+          <div className="checkbox-container">
+            <input id={'check' + r} className="checkbox" type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)} />
             <label htmlFor={'check' + r} />
           </div>
         </td>
@@ -297,8 +297,8 @@ var Table = React.createClass({
           <thead>
           <tr>
             <th className="checkbox-th">
-              <div className="checkbox">
-                <input id="check-all" type="checkbox" checked={this.isCheckedAll()} onChange={this.handleCheckAll} />
+              <div className="checkbox-container">
+                <input id="check-all" className="checkbox" type="checkbox" checked={this.isCheckedAll()} onChange={this.handleCheckAll} />
                 <label htmlFor="check-all" />
               </div>
             </th>

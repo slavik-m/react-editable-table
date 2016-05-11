@@ -56,7 +56,7 @@ module.exports = {
       var {initialData, filters} = nextProps;
 
       var newData = filter.call(this, filters, filterValues, initialData);
-      newData = sort(sortBy, newData);
+      // newData = sort(sortBy, newData);
       this.setState({
         data: newData,
         filterValues: filterValues,
@@ -88,7 +88,7 @@ module.exports = {
 
     filterValues[filterName] = filterValue;
     var newData = filter.call(this, filters, filterValues, initialData);
-    newData = sort(sortBy, newData, type);
+    // newData = sort(sortBy, newData, type);
 
     this.setState({
       data: newData,
@@ -100,12 +100,13 @@ module.exports = {
   handleChange(col, row, val) {
     var prop = col.prop;
     row[prop] = val;
-    this.props.onChange(this.state.data);
+    this.props.onChange(_.union(this.state.data, this.props.initialData));
   },
 
   handleDelete() {
     _.remove(this.state.data, item => item.checked);
-    this.props.onChange(this.state.data);
+    _.remove(this.props.initialData, item => item.checked);
+    this.props.onChange(this.props.initialData);
   },
 
   handleAdd() {

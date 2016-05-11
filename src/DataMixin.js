@@ -82,7 +82,7 @@ module.exports = {
   },
 
   onFilter(filterName, filterValue) {
-    var {filterValues, sortBy} = this.state;
+    var {filterValues, sortBy, data} = this.state;
     var {initialData, filters, columns} = this.props;
     var type = _.find(columns, { 'prop': sortBy.prop }).type;
 
@@ -100,31 +100,12 @@ module.exports = {
   handleChange(col, row, val) {
     var prop = col.prop;
     row[prop] = val;
-
-    this.setState({
-      data: this.state.data
-    }, () => {
-      if(prop !== 'checked') {
-        this.props.onChange(initialData.map(item => {
-          delete item.checked;
-          return item;
-        }));
-      }
-    });
+    this.props.onChange(this.state.data);
   },
 
   handleDelete() {
-    var { initialData } = _.clone(this.state);
-    _.remove(initialData, item => item.checked);
-
-    this.setState({
-      data: initialData
-    }, () => {
-      this.props.onChange(initialData.map(item => {
-        delete item.checked;
-        return item;
-      }));
-    });
+    _.remove(this.state.data, item => item.checked);
+    this.props.onChange(this.state.data);
   },
 
   handleAdd() {

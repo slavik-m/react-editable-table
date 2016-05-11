@@ -7,13 +7,14 @@ var _ = require('lodash');
 
 var App = React.createClass({
   getInitialState(){
-    var data = this.props.cols.map((item, i) => {
+    /*var data = this.props.rows.map((item, i) => {
       item.ukey = i;
       return item;
-    });
+    });*/
     return {
-      tableColumns: data,
-      data: this.props.data
+      tableColumns: this.props.cols,
+      data: this.props.data,
+      loading: 'loading false'
     }
   },
 
@@ -30,8 +31,26 @@ var App = React.createClass({
       data: [
         {
           ukey: 1, domain: 'google.com'
+        },
+        {
+          ukey: 2, domain: 'ask.fm'
+        },
+        {
+          ukey: 3, domain: 'vk.com'
+        },
+        {
+          ukey: 4, domain: 'facebook.com'
+        },
+        {
+          ukey: 5, domain: 'dribbble.com'
         }
       ]
+    });
+  },
+
+  handleState() {
+    this.setState({
+      loading: 'loading true'
     });
   },
 
@@ -39,13 +58,16 @@ var App = React.createClass({
     return (
       <div>
         <button onClick={this.handleClick}>Change data</button>
+        <button onClick={this.handleState}>Change state</button>
+
+        <div>{this.state.loading}</div>
         <DataTable
           className="container"
           keys={[ 'ukey' ]}
           columns={this.state.tableColumns}
           initialData={this.state.data}
           initialPageLength={5}
-          initialSortBy={{ prop: 'phone', order: 'descending' }}
+          initialSortBy={{ prop: 'domain', order: 'ascending' }}
           pageLengthOptions={[ 5, 20, 50 ]}
           onChange={this.handleChange}
           />
@@ -66,6 +88,7 @@ d3.csv('/555_TEST.csv', function (d) {
       title: 'Domain',
       prop: 'domain',
       validation: /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/,
+      type: 'STRING',
       sort: true,
       search: true,
       defaultContent: '<name>'

@@ -1,4 +1,5 @@
 'use strict';
+var React = require('react');
 
 /**
  * Determines if at least one element in the object matches a truth test.
@@ -8,7 +9,17 @@
  * @return {boolean}
  */
 function some(pred, obj) {
+  var val;
   for (var key in obj) {
+    if(~this.props.keys.indexOf(key)) {
+      continue;
+    }
+    if(React.isValidElement(obj[key])) {
+      val = obj[key].props.sortValue ? obj[key].props.sortValue.toLocaleLowerCase() : '';
+      if (pred(val, key) === true) {
+        return true;
+      }
+    }
     if (pred(obj[key], key) === true) {
       return true;
     }
@@ -16,50 +27,81 @@ function some(pred, obj) {
   return false;
 }
 
-function isNumber(o) {
-  return typeof o === 'number' && isFinite(o);
-}
-
 /**
  * Creates a compare function with a property to sort on.
  *
  * @param {string} prop Property to sort.
  * @return {function(object, object)} Compare function.
  */
-var sortByFunc =
-    (prop) =>
-        (a, b) => a[prop] < b[prop] ? -1 : a[prop] > b[prop] ? 1 : 0;
+var sortByFn =
+  function(prop)
+  {return function(a, b)  {return a[prop] < b[prop] ? -1 : a[prop] > b[prop] ? 1 : 0;};};
 
 /**
- * Creates a compare function with a property to sort on.
+ * Creates a compare function with a number property to sort on.
  *
  * @param {string} prop Property to sort.
  * @return {function(object, object)} Compare function.
  */
-var sortByNumberFunc =
-  (prop) =>
-    (a, b) => {
-      return parseFloat(a[prop].replace(/,/gm,''), 10) - parseFloat(b[prop].replace(/,/gm,''), 10);
-      /*parseInt(a[prop].replace(/,/gm,''), 10) < parseInt(b[prop].replace(/,/gm,''), 10) ?
-        -1 : parseInt(a[prop].replace(/,/gm,''), 10) > parseInt(b[prop].replace(/,/gm,''), 10) ?
-        1 : 0*/
-    };
+var sortByNumberFn = function(prop) {
+  return function(a, b)  {
+    var aVal = a[prop] ? parseFloat(a[prop].replace(/[\s\$%,]/gm, ''), 10) : -Infinity,
+      bVal = b[prop] ? parseFloat(b[prop].replace(/[\s\$%,]/gm, ''), 10) : -Infinity;
+    return aVal - bVal;
+  };
+};
+
+/**
+ * Creates a compare function with a string property of ReactElement to sort on.
+ *
+ * @param {string} prop Property to sort.
+ * @return {function(object, object)} Compare function.
+ */
+var sortByElementStringFn = function(prop) {
+  return function(a, b) {
+    var aVal = a[prop].props.sortValue ? a[prop].props.sortValue.toLowerCase() : '',
+      bVal = b[prop].props.sortValue ? b[prop].props.sortValue.toLowerCase() : '';
+    return aVal < bVal ? -1 : (aVal > bVal ? 1 : 0);
+  };
+};
+
+/**
+ * Creates a compare function with a number property of ReactElement to sort on.
+ *
+ * @param {string} prop Property to sort.
+ * @return {function(object, object)} Compare function.
+ */
+var sortByElementNumberFn = function(prop) {
+  return function(a, b) {
+    var aVal = a[prop].props.sortValue ? parseFloat(a[prop].props.sortValue.replace(/[\s\$%,]/gm, ''), 10) : -Infinity,
+      bVal = b[prop].props.sortValue ? parseFloat(b[prop].props.sortValue.replace(/[\s\$%,]/gm, ''), 10) : -Infinity;
+    return aVal - bVal;
+  };
+};
 
 /**
  * @param {object} sortBy Object containing `prop` and `order`.
  * @param {array} data Array to sort.
+ * @param {string} type Field type.
  * @return {array} Sorted array.
  */
-function sort(sortBy, data) {
+function sort(sortBy, data, type) {
   var sortedData;
-  if(data.length === 0) {
+  if (data.length === 0) {
     return [];
   }
 
-  if(isNumber(parseFloat(data[0][sortBy.prop], 10))) {
-    sortedData = data.sort(sortByNumberFunc(sortBy.prop));
-  } else {
-    sortedData = data.sort(sortByFunc(sortBy.prop));
+  switch(type) {
+    case 'ELEMENT_NUMBER':
+      sortedData = data.sort(sortByElementNumberFn(sortBy.prop)); break;
+    case 'ELEMENT_STRING':
+      sortedData = data.sort(sortByElementStringFn(sortBy.prop)); break;
+    case 'NUMBER':
+      sortedData = data.sort(sortByNumberFn(sortBy.prop)); break;
+    case 'STRING':
+      sortedData = data.sort(sortByFn(sortBy.prop)); break;
+    default:
+      sortedData = data.sort(sortByFn(sortBy.prop)); break;
   }
   if (sortBy.order === 'descending') {
     sortedData.reverse();
@@ -73,12 +115,13 @@ function sort(sortBy, data) {
  * @return {function(*, string)} Function to be executed for each entry in data.
  */
 function filterPass(filters, data) {
-  return function(filterValue, key) {
+  return (filterValue, key) => {
     var filterDef = filters[key];
     var partial = filterDef.filter.bind(null, filterValue);
     if (!filterDef.prop) {
       // Filter is for all properties
-      return some(each => partial(each), data);
+      return some.call(this, function(each)  {
+        return partial(each);}, data);
     } else {
       // Filter is for one property
       return partial(data[filterDef.prop]);
@@ -97,8 +140,8 @@ function filterPass(filters, data) {
  * @return {array} Filtered array.
  */
 function filter(filters, filterValues, data) {
-  var filterFunc = filterPass.bind(null, filters);
-  return data.filter(each => some(filterFunc(each), filterValues));
+  var filterFunc = filterPass.bind(this, filters);
+  return data.filter(each => {return some.call(this, filterFunc(each), filterValues);});
 }
 
-module.exports = { filter, filterPass, sort, sortByFunc, some };
+module.exports = {filter:filter, filterPass:filterPass, sort:sort, sortByFunc: sortByFn, some:some};

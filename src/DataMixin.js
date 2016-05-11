@@ -48,11 +48,14 @@ module.exports = {
   },
 
   componentWillReceiveProps(nextProps) {
+    if(_.isEqual(this.props, nextProps)) {
+      return;
+    }
     if(this.state.filterValues.globalSearch) {
       var {filterValues, sortBy} = this.state;
       var {initialData, filters} = nextProps;
 
-      var newData = filter(filters, filterValues, initialData);
+      var newData = filter.call(this, filters, filterValues, initialData);
       newData = sort(sortBy, newData);
       this.setState({
         data: newData,
@@ -71,20 +74,22 @@ module.exports = {
     }
   },
 
-  onSort(sortBy) {
+  onSort(sortBy, type) {
     this.setState({
       sortBy: sortBy,
-      data: sort(sortBy, this.state.data)
+      data: sort(sortBy, this.state.data, type)
     });
   },
 
   onFilter(filterName, filterValue) {
     var {filterValues, sortBy} = this.state;
-    var {initialData, filters} = this.props;
+    var {initialData, filters, columns} = this.props;
+    var type = _.find(columns, { 'prop': sortBy.prop }).type;
 
     filterValues[filterName] = filterValue;
-    var newData = filter(filters, filterValues, initialData);
-    newData = sort(sortBy, newData);
+    var newData = filter.call(this, filters, filterValues, initialData);
+    newData = sort(sortBy, newData, type);
+
     this.setState({
       data: newData,
       filterValues: filterValues,
@@ -93,17 +98,11 @@ module.exports = {
   },
 
   handleChange(col, row, val) {
-    var { initialData } = _.clone(this.state);
-    var index = _.indexOf(initialData, _.find(initialData, row)),
-      prop = col.prop;
-
-    var newRow = _.clone(row);
-      newRow[prop] = val;
-
-    initialData.splice(index, 1, newRow);
+    var prop = col.prop;
+    row[prop] = val;
 
     this.setState({
-      initialData: initialData
+      data: this.state.data
     }, () => {
       if(prop !== 'checked') {
         this.props.onChange(initialData.map(item => {

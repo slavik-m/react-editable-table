@@ -28,23 +28,7 @@ var App = React.createClass({
 
   handleClick() {
     this.setState({
-      data: [
-        {
-          ukey: 1, domain: 'google.com'
-        },
-        {
-          ukey: 2, domain: 'ask.fm'
-        },
-        {
-          ukey: 3, domain: 'vk.com'
-        },
-        {
-          ukey: 4, domain: 'facebook.com'
-        },
-        {
-          ukey: 5, domain: 'dribbble.com'
-        }
-      ]
+      data: [ 'google.com', 'ask.fm', 'vk.com', 'facebook.com', 'dribbble.com']
     });
   },
 
@@ -69,6 +53,8 @@ var App = React.createClass({
           initialPageLength={5}
           initialSortBy={{ prop: 'domain', order: 'ascending' }}
           pageLengthOptions={[ 5, 20, 50 ]}
+          dataType="ARRAY"
+          dataScheme={['domain']}
           onChange={this.handleChange}
           />
       </div>
@@ -77,10 +63,7 @@ var App = React.createClass({
 });
 
 d3.csv('/555_TEST.csv', function (d) {
-  return {
-    ukey: _.uniqueId(),
-    domain: d.domain
-  };
+  return d.domain;
 }, function (error, rows) {
   // var data = _.uniq(rows);
   var cols = [

@@ -53,14 +53,14 @@ var DataTable = React.createClass({
           onAdd={this.handleAdd}
         />
         <div className="row">
-          <div className="col-xs-6">
+          <div className="col-xs-4">
             <Counter
               showing={this.state.pageLength * page.currentPage + 1}
               to={this.state.pageLength * page.currentPage + page.data.length}
               count={this.state.data.length}
               />
           </div>
-          <div className="col-xs-6">
+          <div className="col-xs-8">
             <Pagination
               className="pagination pull-right pagination-sm"
               currentPage={page.currentPage}

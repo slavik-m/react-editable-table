@@ -12,13 +12,14 @@ var containsIgnoreCase = function(a, b) {
 module.exports = {
 
   getInitialState() {
-    var data = this.props.initialData.slice(0);
+    var data = this.convertFromArray(this.props.initialData);
     var itemKeys = this.props.columns.map(item => item.prop);
-    // if()
+
     return {
       // Clone the initialData.
       data: data,
       initialData: data,
+      stateCache: data,
       sortBy: this.props.initialSortBy,
       filterValues: {},
       currentPage: 0,
@@ -51,27 +52,49 @@ module.exports = {
     if(_.isEqual(this.props, nextProps)) {
       return;
     }
-    if(this.state.filterValues.globalSearch) {
-      var {filterValues, sortBy} = this.state;
-      var {initialData, filters} = nextProps;
+    var {filterValues, sortBy} = this.state;
+    var {initialData, filters} = nextProps;
 
-      var newData = filter.call(this, filters, filterValues, initialData);
+    var newInitialData = this.convertFromArray(initialData);
+
+    if(this.state.filterValues.globalSearch) {
+      var newData = filter.call(this, filters, filterValues, newInitialData);
       // newData = sort(sortBy, newData);
       this.setState({
         data: newData,
+        stateCache: newInitialData,
         filterValues: filterValues,
         currentPage: 0
       });
     } else {
       this.setState({
-        data: nextProps.initialData,
-        initialData: nextProps.initialData,
+        data: newInitialData,
+        initialData: newInitialData,
+        stateCache: newInitialData,
         currentPage: 0,
         filterValues: {
           globalSearch: ''
         }
       });
     }
+  },
+
+  convertFromArray (data) {
+    if(this.props.dataType === "ARRAY" && this.props.dataScheme.length === 1) {
+      return data.map(item => {
+        return {
+          [this.props.dataScheme[0]]: item,
+          ukey: _.uniqueId()
+        }
+      });
+    }
+    return data;
+  },
+
+  convertToArray (data) {
+    return data.map(item => {
+      return item[this.props.dataScheme[0]]
+    });
   },
 
   onSort(sortBy, type) {
@@ -85,13 +108,16 @@ module.exports = {
     var {filterValues, sortBy, data} = this.state;
     var {initialData, filters, columns} = this.props;
     var type = _.find(columns, { 'prop': sortBy.prop }).type;
+    var newInitialData = this.convertFromArray(initialData);
 
     filterValues[filterName] = filterValue;
-    var newData = filter.call(this, filters, filterValues, initialData);
+    var newData = filter.call(this, filters, filterValues, newInitialData);
     // newData = sort(sortBy, newData, type);
+    // console.log("OnFilter", newData, "Cache", data.slice(0));
 
     this.setState({
       data: newData,
+      stateCache: data.slice(0),
       filterValues: filterValues,
       currentPage: 0
     });
@@ -100,13 +126,24 @@ module.exports = {
   handleChange(col, row, val) {
     var prop = col.prop;
     row[prop] = val;
-    this.props.onChange(_.union(this.state.data, this.props.initialData));
+
+    if(prop !== "checked"){
+      this.props.onChange(this.convertToArray(this.state.data));
+    } else {
+      // _.find(this.state.data, ['active', false]);
+      this.setState(this.state.data);
+    }
+
+    // this.props.onChange(_.union(this.state.data, this.convertFromArray(this.props.initialData)));
+    //console.log("onChange", col, row, val, this.convertToArray(this.state.data));
+    //this.props.onChange(this.convertToArray(this.state.data));
+    // this.props.onChange(_.union(this.convertToArray(this.state.data), this.props.initialData));
   },
 
   handleDelete() {
     _.remove(this.state.data, item => item.checked);
-    _.remove(this.props.initialData, item => item.checked);
-    this.props.onChange(this.props.initialData);
+    _.remove(this.state.stateCache, item => item.checked);
+    this.props.onChange(this.convertToArray(this.state.stateCache));
   },
 
   handleAdd() {

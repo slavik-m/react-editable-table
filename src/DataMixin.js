@@ -85,6 +85,7 @@ module.exports = {
         var obj = {};
         obj[this.props.dataScheme[0]] = item;
         obj.ukey = _.uniqueId();
+        return obj;
       });
     }
     return data;

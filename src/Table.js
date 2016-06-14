@@ -3,7 +3,10 @@
 var React = require('react');
 
 var simpleGet = key => data => data[key];
-var keyGetter = keys => data => keys.map(key => data[key]);
+var keyGetter = keys => data => keys.map(key => {
+  console.log(data);
+  return data[key]
+});
 
 var isEmpty = value => value === undefined || value === null || value === '';
 var _ = require('lodash');

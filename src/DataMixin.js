@@ -82,10 +82,9 @@ module.exports = {
   convertFromArray (data) {
     if(this.props.dataType === "ARRAY" && this.props.dataScheme.length === 1) {
       return data.map(item => {
-        return {
-          [this.props.dataScheme[0]]: item,
-          ukey: _.uniqueId()
-        }
+        var obj = {};
+        obj[this.props.dataScheme[0]] = item;
+        obj.ukey = _.uniqueId();
       });
     }
     return data;

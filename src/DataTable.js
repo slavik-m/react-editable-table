@@ -48,6 +48,7 @@ var DataTable = React.createClass({
           keys={this.props.keys}
           sortBy={this.state.sortBy}
           onSort={this.onSort}
+          onToggleCheckAll={this.handleToggleCheckAll}
           onChange={this.handleChange}
           onDelete={this.handleDelete}
           onAdd={this.handleAdd}

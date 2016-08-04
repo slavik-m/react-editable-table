@@ -218,7 +218,7 @@ var Table = React.createClass({
   },
 
   handleCheckAll(ev) {
-    this.props.dataArray.forEach(row => this.props.onChange({prop: 'checked'}, row, ev.target.checked));
+    this.props.onToggleCheckAll(ev.target.checked);
   },
 
   isCheckedAll() {

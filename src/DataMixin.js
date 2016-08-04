@@ -140,6 +140,15 @@ module.exports = {
     // this.props.onChange(_.union(this.convertToArray(this.state.data), this.props.initialData));
   },
 
+  handleToggleCheckAll(flag) {
+    console.log('check all', this.state.data);
+    this.state.data.forEach(item => {
+      item.checked = !!flag;
+      return item;
+    });
+    this.setState(this.state.data);
+  },
+
   handleDelete() {
     _.remove(this.state.data, item => item.checked);
     _.remove(this.state.stateCache, item => item.checked);

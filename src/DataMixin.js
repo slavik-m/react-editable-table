@@ -141,7 +141,7 @@ module.exports = {
   },
 
   handleToggleCheckAll(flag) {
-    console.log('check all', this.state.data);
+    //console.log('check all', this.state.data);
     this.state.data.forEach(item => {
       item.checked = !!flag;
       return item;

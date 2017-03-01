@@ -8,9 +8,9 @@ var _ = require('lodash');
 var App = React.createClass({
   getInitialState(){
     /*var data = this.props.rows.map((item, i) => {
-      item.ukey = i;
-      return item;
-    });*/
+     item.ukey = i;
+     return item;
+     });*/
     return {
       tableColumns: this.props.cols,
       data: this.props.data,
@@ -28,7 +28,20 @@ var App = React.createClass({
 
   handleClick() {
     this.setState({
-      data: [ 'google.com', 'ask.fm', 'vk.com', 'facebook.com', 'dribbble.com']
+      data: [
+        {
+          type: '*',
+          value: '*some.com',
+        },
+        {
+          type: 'app',
+          value: '*df.com',
+        },
+        {
+          type: 'site',
+          value: 'site.com',
+        }
+      ]
     });
   },
 
@@ -47,35 +60,56 @@ var App = React.createClass({
         <div>{this.state.loading}</div>
         <DataTable
           className="container"
-          keys={[ 'ukey' ]}
+          keys={['ukey']}
           columns={this.state.tableColumns}
           initialData={this.state.data}
           initialPageLength={5}
-          initialSortBy={{ prop: 'domain', order: 'ascending' }}
-          pageLengthOptions={[ 5, 20, 50 ]}
-          dataType="ARRAY"
-          dataScheme={['domain']}
+          initialSortBy={{ prop: 'type', order: 'ascending' }}
+          pageLengthOptions={[5, 20, 50]}
           onChange={this.handleChange}
-          />
+        />
+        <pre>
+          <code>
+            {JSON.stringify(this.state.data, null, 2)}
+          </code>
+        </pre>
       </div>
     );
   }
 });
 
 d3.csv('/555_TEST.csv', function (d) {
-  return d.domain;
+  return d;
 }, function (error, rows) {
   // var data = _.uniq(rows);
   var cols = [
     {
-      title: 'Domain',
-      prop: 'domain',
-      validation: /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/,
+      title: 'type',
+      prop: 'type',
       type: 'STRING',
       sort: true,
       search: true,
-      defaultContent: '<name>'
-    }
+      defaultContent: '*',
+      editor: {
+        type: 'text',
+        options: [
+          { label: '*', value: '*' },
+          { label: 'app', value: 'app' },
+          { label: 'site', value: 'site' }
+        ]
+      }
+    },
+    {
+      title: 'Domain',
+      prop: 'value',
+      type: 'STRING',
+      sort: true,
+      search: true,
+      defaultContent: '<domain>',
+      editor: {
+        type: 'text'
+      }
+    },
   ];
   React.render(<App data={rows} cols={cols}/>, document.body);
 });

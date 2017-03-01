@@ -12,8 +12,12 @@ var containsIgnoreCase = function(a, b) {
 module.exports = {
 
   getInitialState() {
-    var data = this.convertFromArray(this.props.initialData);
+    // var data = this.convertFromArray(this.props.initialData);
     var itemKeys = this.props.columns.map(item => item.prop);
+    var data = this.props.initialData.map(item => {
+      item.ukey = _.uniqueId();
+      return item;
+    });
 
     return {
       // Clone the initialData.
@@ -55,7 +59,12 @@ module.exports = {
     var {filterValues, sortBy} = this.state;
     var {initialData, filters} = nextProps;
 
-    var newInitialData = this.convertFromArray(initialData);
+    // var newInitialData = this.convertFromArray(initialData);
+
+    var newInitialData = initialData.map(item => {
+      item.ukey = _.uniqueId();
+      return item;
+    });
 
     if(this.state.filterValues.globalSearch) {
       var newData = filter.call(this, filters, filterValues, newInitialData);
@@ -79,24 +88,6 @@ module.exports = {
     }
   },
 
-  convertFromArray (data) {
-    if(this.props.dataType === "ARRAY" && this.props.dataScheme.length === 1) {
-      return data.map(item => {
-        var obj = {};
-        obj[this.props.dataScheme[0]] = item;
-        obj.ukey = _.uniqueId();
-        return obj;
-      });
-    }
-    return data;
-  },
-
-  convertToArray (data) {
-    return data.map(item => {
-      return item[this.props.dataScheme[0]]
-    });
-  },
-
   onSort(sortBy, type) {
     this.setState({
       sortBy: sortBy,
@@ -108,10 +99,10 @@ module.exports = {
     var {filterValues, sortBy, data} = this.state;
     var {initialData, filters, columns} = this.props;
     var type = _.find(columns, { 'prop': sortBy.prop }).type;
-    var newInitialData = this.convertFromArray(initialData);
+    // var newInitialData = this.convertFromArray(initialData);
 
     filterValues[filterName] = filterValue;
-    var newData = filter.call(this, filters, filterValues, newInitialData);
+    var newData = filter.call(this, filters, filterValues, initialData);
     // newData = sort(sortBy, newData, type);
     // console.log("OnFilter", newData, "Cache", data.slice(0));
 
@@ -128,7 +119,7 @@ module.exports = {
     row[prop] = val;
 
     if(prop !== "checked"){
-      this.props.onChange(this.convertToArray(this.state.data));
+      this.props.onChange(this.state.data);
     } else {
       // _.find(this.state.data, ['active', false]);
       this.setState(this.state.data);
@@ -152,7 +143,7 @@ module.exports = {
   handleDelete() {
     _.remove(this.state.data, item => item.checked);
     _.remove(this.state.stateCache, item => item.checked);
-    this.props.onChange(this.convertToArray(this.state.stateCache));
+    this.props.onChange(this.state.stateCache);
   },
 
   handleAdd() {

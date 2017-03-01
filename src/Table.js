@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var getEditorByType = require('./editors/getEditorByType');
 
 var simpleGet = key => data => data[key];
 var keyGetter = keys => data => keys.map(key => {
@@ -28,7 +29,7 @@ var getCellClass =
 function buildSortProps(col, sortBy, onSort) {
   var order = sortBy.prop === col.prop ? sortBy.order : 'none';
   var nextOrder = order === 'ascending' ? 'descending' : 'ascending';
-  var sortEvent = onSort.bind(null, {prop: col.prop, order: nextOrder});
+  var sortEvent = onSort.bind(null, { prop: col.prop, order: nextOrder });
 
   return {
     'onClick': sortEvent,
@@ -44,71 +45,47 @@ function buildSortProps(col, sortBy, onSort) {
   };
 }
 
-var EditInput = React.createClass({
+var Cell = React.createClass({
   getInitialState() {
     return {
-      value: this.props.value
+      edit: false
     }
-  },
-
-  componentDidMount() {
-    this.getDOMNode().focus();
-  },
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      value: nextProps.value
-    });
   },
 
   handleChange(ev) {
-    this.setState({
-      value: ev.target.value
-    });
+    this.props.onChane(ev.target.value);
   },
 
-  handleFocus(ev) {
-    ev.target.focus();
-    var length = ev.target.value.length;
-    ev.target.setSelectionRange(length, length);
+  handleCancel(ev) {
+    this.setState({ edit: false });
+    this.props.onCancel(ev.target.value);
   },
 
-  handleSave(ev) {
-    this.props.onChange(this.props.col, this.props.row, this.state.value, this.props.target);
-  },
-
-  handleBlur(ev) {
-    if(this.props.col.hasOwnProperty('validation')){
-      if(this.props.col.validation.test(ev.target.value)) {
-        this.handleSave();
-      } else {
-        this.props.onCancel(this.props.col, this.props.row, this.props.target);
-      }
-    } else {
-      this.handleSave();
-    }
-  },
-
-  handleKeyUp(ev) {
-    if (ev.keyCode === 13) {
-      this.handleSave(ev);
-    }
-    if (ev.keyCode === 27) {
-      this.props.onCancel(this.props.col, this.props.row, this.props.target);
-    }
+  handleCellClick(ev) {
+    this.setState({ edit: true });
   },
 
   render() {
+    var {col, row} = this.props;
+    var Editor = getEditorByType(col.editor.type);
+
     return (
-      <input type="text"
-             style={{width: '100%'}}
-             className="edit-input"
-             value={this.state.value}
-             onChange={this.handleChange}
-             onBlur={this.handleBlur}
-             onFocus={this.handleFocus}
-             onKeyUp={this.handleKeyUp}/>
-    );
+      <td ref={i + getCellValue(col, row)}
+          className={getCellClass(col, row)}
+          onClick={this.handleCellClick}>
+        {
+          !this.state.edit ? getCellValue(col, row) :
+          <Editor
+            editor={col.editor}
+            value={row[col.prop]}
+            col={col}
+            row={row}
+            onChange={this.handleChange}
+            onCancel={this.handleCancel}
+          />
+        }
+      </td>
+    )
   }
 });
 
@@ -177,20 +154,24 @@ var Table = React.createClass({
 
   handleCellClick(col, row, ev) {
     ev.target.classList.remove('empty-cell');
-    React.render(<EditInput value={row[col.prop]}
-                            col={col}
-                            row={row}
-                            target={ev.target}
-                            onChange={this.handleChange}
-                            onCancel={this.handleCancel} />, ev.target);
+    var Editor = getEditorByType(col.editor.type);
+
+    React.render(<Editor
+      editor={col.editor}
+      value={row[col.prop]}
+      col={col}
+      row={row}
+      target={ev.target}
+      onChange={this.handleChange}
+      onCancel={this.handleCancel}/>, ev.target);
   },
 
   handleChange(col, row, val, target) {
-    if(col.hasOwnProperty('validation')){
-      if(col.validation.test(val)) {
+    if (col.hasOwnProperty('validation')) {
+      if (col.validation.test(val)) {
         target.classList.remove('error');
         this.props.onChange(col, row, val);
-        React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
+        // React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
       } else {
         this.setError(target);
       }
@@ -202,7 +183,7 @@ var Table = React.createClass({
 
   handleCancel(col, row, target) {
     target.classList.remove('error');
-    React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
+    // React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
   },
 
   handleDelete() {
@@ -214,7 +195,7 @@ var Table = React.createClass({
   },
 
   handleCheck(row, ev) {
-    this.props.onChange({prop: 'checked'}, row, ev.target.checked);
+    this.props.onChange({ prop: 'checked' }, row, ev.target.checked);
   },
 
   handleCheckAll(ev) {
@@ -240,7 +221,7 @@ var Table = React.createClass({
         <th
           ref={`th-${idx}`}
           key={idx}
-          style={{width: col.width}}
+          style={{ width: col.width }}
           role="columnheader"
           scope="col"
           {...sortProps}>
@@ -253,16 +234,18 @@ var Table = React.createClass({
     });
 
     var getKeys = Array.isArray(keys) ? keyGetter(keys) : simpleGet(keys);
+    console.log('render');
     var rows = this.props.dataArray.map((row, r) =>
       <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr">
         <td key={r} className="checkbox-td">
           <div className="checkbox-container">
-            <input id={'check' + r} className="checkbox" type="checkbox" checked={row.checked} onChange={this.handleCheck.bind(this, row)} />
-            <label htmlFor={'check' + r} />
+            <input id={'check' + r} className="checkbox" type="checkbox" checked={row.checked}
+                   onChange={this.handleCheck.bind(this, row)}/>
+            <label htmlFor={'check' + r}/>
           </div>
         </td>
         {columns.map(
-          (col, i) =>{
+          (col, i) => {
             var edit = col.hasOwnProperty('editable') ? col.editable : true;
             return edit ?
               (<td key={i}
@@ -300,8 +283,9 @@ var Table = React.createClass({
           <tr>
             <th className="checkbox-th">
               <div className="checkbox-container">
-                <input id="check-all" className="checkbox" type="checkbox" checked={this.isCheckedAll()} onChange={this.handleCheckAll} />
-                <label htmlFor="check-all" />
+                <input id="check-all" className="checkbox" type="checkbox" checked={this.isCheckedAll()}
+                       onChange={this.handleCheckAll}/>
+                <label htmlFor="check-all"/>
               </div>
             </th>
             {headers}

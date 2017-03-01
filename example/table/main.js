@@ -91,7 +91,7 @@ d3.csv('/555_TEST.csv', function (d) {
       search: true,
       defaultContent: '*',
       editor: {
-        type: 'text',
+        type: 'dropdown',
         options: [
           { label: '*', value: '*' },
           { label: 'app', value: 'app' },

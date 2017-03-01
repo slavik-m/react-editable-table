@@ -12,47 +12,44 @@ var DropDownEditor = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    /* this.setState({
+    this.setState({
       value: nextProps.value
-    }); */
+    });
   },
 
   handleChange(ev) {
-    console.log('change', ev.target.value );
-    /* this.setState({
-      value: ev.target.value
-    }); */
+    this.props.onChange(ev.target.value);
+    this.props.onCancel();
   },
 
   handleFocus(ev) {
-    // ev.target.focus();
+    ev.target.focus();
   },
 
   handleSave(ev) {
-    this.props.onChange(this.props.col, this.props.row, this.state.value, this.props.target);
+    this.props.onChange(this.state.value);
   },
 
   handleBlur(ev) {
-    console.log('Blur');
     if(this.props.col.hasOwnProperty('validation')){
       if(this.props.col.validation.test(ev.target.value)) {
         this.handleSave();
       } else {
-        this.props.onCancel(this.props.col, this.props.row, this.props.target);
+        this.props.onCancel();
       }
     } else {
-      this.handleSave();
+      this.props.onCancel();
     }
   },
 
-  /* handleKeyUp(ev) {
+  handleKeyUp(ev) {
     if (ev.keyCode === 13) {
       this.handleSave(ev);
     }
     if (ev.keyCode === 27) {
-      this.props.onCancel(this.props.col, this.props.row, this.props.target);
+      this.props.onCancel();
     }
-  },*/
+  },
 
   render() {
     return (
@@ -60,9 +57,9 @@ var DropDownEditor = React.createClass({
              className="edit-input"
              value={this.state.value}
              onChange={this.handleChange}
-             // onBlur={this.handleBlur}
-             // onFocus={this.handleFocus}
-             //onKeyUp={this.handleKeyUp}
+             onBlur={this.handleBlur}
+             onFocus={this.handleFocus}
+             onKeyUp={this.handleKeyUp}
       >
         {this.props.editor.options.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}
       </select>

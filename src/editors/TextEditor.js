@@ -30,7 +30,8 @@ var TextEditor = React.createClass({
   },
 
   handleSave(ev) {
-    this.props.onChange(this.props.col, this.props.row, this.state.value, this.props.target);
+    this.props.onCancel();
+    this.props.onChange(this.state.value);
   },
 
   handleBlur(ev) {

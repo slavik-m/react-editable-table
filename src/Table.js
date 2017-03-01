@@ -48,41 +48,68 @@ function buildSortProps(col, sortBy, onSort) {
 var Cell = React.createClass({
   getInitialState() {
     return {
-      edit: false
+      edit: false,
+      focused: false,
     }
   },
 
-  handleChange(ev) {
-    this.props.onChane(ev.target.value);
+  handleChange(value) {
+    var { col, row } = this.props;
+    this.props.onChange(col, row, value);
+    this.state.focused = false;
   },
 
-  handleCancel(ev) {
-    this.setState({ edit: false });
-    this.props.onCancel(ev.target.value);
+  handleCancel() {
+    this.state.edit = false;
+    this.state.focused = false;
+    this.setState(this.state);
   },
 
-  handleCellClick(ev) {
-    this.setState({ edit: true });
+  handleCellClick() {
+    this.state.edit = true;
+    this.setState(this.state);
+  },
+
+  handleKeyUp(ev) {
+    if (ev.keyCode === 13 && this.state.focused) {
+      this.state.edit = true;
+      this.setState(this.state);
+    }
+  },
+
+  handleFocus() {
+    this.state.focused = true;
+    this.setState(this.state);
+  },
+
+  handleBlur() {
+    this.state.focused = false;
+    this.setState(this.state);
   },
 
   render() {
-    var {col, row} = this.props;
+    var { col, row } = this.props;
     var Editor = getEditorByType(col.editor.type);
 
     return (
-      <td ref={i + getCellValue(col, row)}
-          className={getCellClass(col, row)}
-          onClick={this.handleCellClick}>
+      <td
+        tabIndex={0}
+        className={getCellClass(col, row)}
+        onClick={this.handleCellClick}
+        onFocus={this.handleFocus}
+        onBlur={this.handleBlur}
+        onKeyUp={this.handleKeyUp}
+      >
         {
           !this.state.edit ? getCellValue(col, row) :
-          <Editor
-            editor={col.editor}
-            value={row[col.prop]}
-            col={col}
-            row={row}
-            onChange={this.handleChange}
-            onCancel={this.handleCancel}
-          />
+            <Editor
+              editor={col.editor}
+              value={row[col.prop]}
+              col={col}
+              row={row}
+              onChange={this.handleChange}
+              onCancel={this.handleCancel}
+            />
         }
       </td>
     )
@@ -166,24 +193,17 @@ var Table = React.createClass({
       onCancel={this.handleCancel}/>, ev.target);
   },
 
-  handleChange(col, row, val, target) {
+  handleChange(col, row, val) {
     if (col.hasOwnProperty('validation')) {
       if (col.validation.test(val)) {
         target.classList.remove('error');
         this.props.onChange(col, row, val);
-        // React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
       } else {
         this.setError(target);
       }
     } else {
       this.props.onChange(col, row, val);
-      React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
     }
-  },
-
-  handleCancel(col, row, target) {
-    target.classList.remove('error');
-    // React.render(<span className={getCellClass(col, row)}>{getCellValue(col, row)}</span>, target);
   },
 
   handleDelete() {
@@ -234,7 +254,6 @@ var Table = React.createClass({
     });
 
     var getKeys = Array.isArray(keys) ? keyGetter(keys) : simpleGet(keys);
-    console.log('render');
     var rows = this.props.dataArray.map((row, r) =>
       <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr">
         <td key={r} className="checkbox-td">
@@ -248,12 +267,14 @@ var Table = React.createClass({
           (col, i) => {
             var edit = col.hasOwnProperty('editable') ? col.editable : true;
             return edit ?
-              (<td key={i}
-                   ref={i + getCellValue(col, row)}
-                   className={getCellClass(col, row)}
-                   onClick={this.handleCellClick.bind(this, col, row)}>
-                {getCellValue(col, row)}
-              </td>) :
+              (<Cell
+                key={i}
+                ref={i + getCellValue(col, row)}
+                className={getCellClass(col, row)}
+                col={col}
+                row={row}
+                onChange={this.handleChange}
+              />) :
               (<td key={i}
                    ref={i + getCellValue(col, row)}
                    className={getCellClass(col, row)}>

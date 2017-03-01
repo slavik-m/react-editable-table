@@ -53,9 +53,6 @@ module.exports = {
   },
 
   componentWillReceiveProps(nextProps) {
-    if(_.isEqual(this.props, nextProps)) {
-      return;
-    }
     var {filterValues, sortBy} = this.state;
     var {initialData, filters} = nextProps;
 
@@ -119,7 +116,10 @@ module.exports = {
     row[prop] = val;
 
     if(prop !== "checked"){
-      this.props.onChange(this.state.data);
+      this.props.onChange(this.state.data.map(item => {
+        delete item.ukey;
+        return item;
+      }));
     } else {
       // _.find(this.state.data, ['active', false]);
       this.setState(this.state.data);
@@ -132,8 +132,9 @@ module.exports = {
   },
 
   handleToggleCheckAll(flag) {
-    //console.log('check all', this.state.data);
-    this.state.data.forEach(item => {
+    // console.log('check all', this.state.data);
+    // console.log(this.buildPage());
+    this.buildPage().data.forEach(item => {
       item.checked = !!flag;
       return item;
     });

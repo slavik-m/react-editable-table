@@ -80,14 +80,14 @@ module.exports = {
         data: newData,
         stateCache: newInitialData,
         filterValues: filterValues,
-        currentPage: 0
+        // currentPage: 0
       });
     } else {
       this.setState({
         data: newInitialData,
         initialData: newInitialData,
         stateCache: newInitialData,
-        currentPage: 0,
+        // currentPage: 0,
         filterValues: {
           globalSearch: ''
         }
@@ -115,21 +115,32 @@ module.exports = {
 
     this.setState({
       data: newData,
-      stateCache: data.slice(0),
+      stateCache: initialData.slice(0),
       filterValues: filterValues,
       currentPage: 0
     });
   },
 
   handleChange(col, row, val) {
+    const index = _.findIndex(this.state.stateCache, function(item) { return item.ukey == row.ukey; });
+
     var prop = col.prop;
     row[prop] = val;
 
+    if(index !== -1) {
+      this.state.stateCache.splice(index, 1, row);
+    }
+
+    // const data = _.merge(this.props.initialData, this.state.data);
+
     if(prop !== "checked"){
-      this.props.onChange(removeUKeys(this.state.data));
+      this.props.onChange(removeUKeys(this.state.stateCache));
     } else {
       // _.find(this.state.data, ['active', false]);
-      this.setState(this.state.data);
+      /*this.setState({
+        // data: this.state.stateCache,
+        stateCache: this.state.stateCache.slice(0),
+      }); */
     }
 
     // this.props.onChange(_.union(this.state.data, this.convertFromArray(this.props.initialData)));

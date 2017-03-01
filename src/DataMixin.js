@@ -9,15 +9,28 @@ var containsIgnoreCase = function(a, b) {
   return b.indexOf(a) >= 0;
 };
 
+function setUKeys(data) {
+  return data.map(item => {
+    item.ukey = _.uniqueId();
+    return item;
+  });
+}
+
+function removeUKeys(data) {
+  return data.map(item => {
+    delete item.ukey;
+    // TODO: checked
+    delete item.checked;
+    return item;
+  });
+}
+
 module.exports = {
 
   getInitialState() {
     // var data = this.convertFromArray(this.props.initialData);
     var itemKeys = this.props.columns.map(item => item.prop);
-    var data = this.props.initialData.map(item => {
-      item.ukey = _.uniqueId();
-      return item;
-    });
+    var data = setUKeys(this.props.initialData);
 
     return {
       // Clone the initialData.
@@ -58,10 +71,7 @@ module.exports = {
 
     // var newInitialData = this.convertFromArray(initialData);
 
-    var newInitialData = initialData.map(item => {
-      item.ukey = _.uniqueId();
-      return item;
-    });
+    var newInitialData = setUKeys(initialData);
 
     if(this.state.filterValues.globalSearch) {
       var newData = filter.call(this, filters, filterValues, newInitialData);
@@ -116,10 +126,7 @@ module.exports = {
     row[prop] = val;
 
     if(prop !== "checked"){
-      this.props.onChange(this.state.data.map(item => {
-        delete item.ukey;
-        return item;
-      }));
+      this.props.onChange(removeUKeys(this.state.data));
     } else {
       // _.find(this.state.data, ['active', false]);
       this.setState(this.state.data);
@@ -144,14 +151,15 @@ module.exports = {
   handleDelete() {
     _.remove(this.state.data, item => item.checked);
     _.remove(this.state.stateCache, item => item.checked);
-    this.props.onChange(this.state.stateCache);
+    this.props.onChange(removeUKeys(this.state.stateCache));
   },
 
   handleAdd() {
     var { initialData } = _.clone(this.state);
     var newObj = { ukey: Date.now()};
     this.state.itemKeys.forEach(key => {
-      newObj[key] = '';
+      var col = _.find(this.props.columns, (item) => item.prop === key);
+      newObj[key] = col.defaultValue || '';
     });
     initialData.unshift(newObj);
 

@@ -19,7 +19,7 @@ var App = React.createClass({
   },
 
   handleChange(data) {
-    console.log(data.length);
+    // console.log(data.length);
     this.setState({
       data: data
     });
@@ -90,6 +90,7 @@ d3.csv('/555_TEST.csv', function (d) {
       sort: true,
       search: true,
       defaultContent: '*',
+      defaultValue: '*',
       editor: {
         type: 'dropdown',
         options: [

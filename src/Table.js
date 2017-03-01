@@ -5,7 +5,6 @@ var getEditorByType = require('./editors/getEditorByType');
 
 var simpleGet = key => data => data[key];
 var keyGetter = keys => data => keys.map(key => {
-  console.log(key, data[key], 'keyGetter');
   return data[key]
 });
 
@@ -256,7 +255,7 @@ var Table = React.createClass({
 
     var getKeys = Array.isArray(keys) ? keyGetter(keys) : simpleGet(keys);
     var rows = this.props.dataArray.map((row, r) =>
-      <tr key={getKeys(row)} {...buildRowOpts(row)} className="data-tr">
+      <tr key={_.uniqueId()} {...buildRowOpts(row)} className="data-tr">
         <td key={r} className="checkbox-td">
           <div className="checkbox-container">
             <input id={'check' + r} className="checkbox" type="checkbox" checked={row.checked}

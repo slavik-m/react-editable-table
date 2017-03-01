@@ -5,6 +5,7 @@ var getEditorByType = require('./editors/getEditorByType');
 
 var simpleGet = key => data => data[key];
 var keyGetter = keys => data => keys.map(key => {
+  console.log(key, data[key], 'keyGetter');
   return data[key]
 });
 

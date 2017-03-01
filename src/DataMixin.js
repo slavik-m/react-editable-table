@@ -175,6 +175,7 @@ module.exports = {
   buildPage() {
     var {data, currentPage, pageLength} = this.state;
     var start = pageLength * currentPage;
+    console.log(data);
     return {
       data: data.slice(start, start + pageLength),
       currentPage: currentPage,

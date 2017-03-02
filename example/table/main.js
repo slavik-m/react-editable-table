@@ -19,7 +19,7 @@ var App = React.createClass({
   },
 
   handleChange(data) {
-    // console.log(data.length);
+    console.log(data);
     this.setState({
       data: data
     });
@@ -112,7 +112,7 @@ d3.csv('/555_TEST.csv', function (d) {
       }
     },
   ];
-  React.render(<App data={rows} cols={cols}/>, document.body);
+  React.render(<App data={[]} cols={cols}/>, document.body);
 });
 
 /*

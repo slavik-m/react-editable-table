@@ -10,14 +10,14 @@ var containsIgnoreCase = function(a, b) {
 };
 
 function setUKeys(data) {
-  return data.map(item => {
+  return _.cloneDeep(data).map(item => {
     item.ukey = _.uniqueId();
     return item;
   });
 }
 
 function removeUKeys(data) {
-  return data.map(item => {
+  return _.cloneDeep(data).map(item => {
     delete item.ukey;
     // TODO: checked
     delete item.checked;
@@ -134,7 +134,8 @@ module.exports = {
     // const data = _.merge(this.props.initialData, this.state.data);
 
     if(prop !== "checked"){
-      this.props.onChange(removeUKeys(this.state.stateCache));
+      const data = removeUKeys(_.cloneDeep(this.state.stateCache));
+      this.props.onChange(data);
     } else {
       // _.find(this.state.data, ['active', false]);
       /*this.setState({
@@ -180,6 +181,8 @@ module.exports = {
         globalSearch: ''
       }
     });
+
+    // this.props.onChange(removeUKeys(initialData));
   },
 
   // Pagination
